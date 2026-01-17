@@ -1,0 +1,23 @@
+{
+  "common": {
+    "back": "Back",
+    "lastUpdated": "Last updated: 2025"
+  },
+
+  "terms": {
+    "title": "Terms & Conditions",
+    "subtitle": "Please read these terms carefully",
+
+    "termsOfUse": "Terms of Use",
+    "termsOfUseText": "By using WALLE, you agree to use the application responsibly.",
+
+    "medicalDisclaimer": "Medical Disclaimer",
+    "medicalDisclaimerText": "WALLE does not provide medical advice.",
+
+    "accountResponsibility": "Account Responsibility",
+    "accountResponsibilityText": "You are responsible for your account.",
+
+    "limitation": "Limitation of Liability",
+    "limitationText": "WALLE is not liable for damages."
+  }
+}

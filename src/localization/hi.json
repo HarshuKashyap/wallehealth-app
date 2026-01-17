@@ -1,0 +1,23 @@
+{
+  "common": {
+    "back": "वापस",
+    "lastUpdated": "अंतिम अपडेट: 2025"
+  },
+
+  "terms": {
+    "title": "नियम और शर्तें",
+    "subtitle": "कृपया इन नियमों को ध्यान से पढ़ें",
+
+    "termsOfUse": "उपयोग की शर्तें",
+    "termsOfUseText": "WALLE का उपयोग करके आप ऐप को जिम्मेदारी से उपयोग करने के लिए सहमत होते हैं।",
+
+    "medicalDisclaimer": "चिकित्सकीय अस्वीकरण",
+    "medicalDisclaimerText": "WALLE कोई चिकित्सकीय सलाह प्रदान नहीं करता।",
+
+    "accountResponsibility": "खाता जिम्मेदारी",
+    "accountResponsibilityText": "आप अपने खाते की गोपनीयता के लिए जिम्मेदार हैं।",
+
+    "limitation": "देयता की सीमा",
+    "limitationText": "WALLE किसी भी नुकसान के लिए उत्तरदायी नहीं है।"
+  }
+}

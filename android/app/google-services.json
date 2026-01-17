@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "1069891035351",
+    "project_id": "wallehealthapp-d408a",
+    "storage_bucket": "wallehealthapp-d408a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1069891035351:android:17101b60d04f2940a79092",
+        "android_client_info": {
+          "package_name": "com.wallehealthapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1069891035351-beegu19locrpkqk1tpthivp4d7nlpiug.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.wallehealthapp",
+            "certificate_hash": "edabd3cfd38ded4d0d96b545cfe9c3822b636684"
+          }
+        },
+        {
+          "client_id": "1069891035351-a7djsls7n4mofv8gppi06l821io165kd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAGGiqqKRBNia_GdoSAVUD4WMvqeO93TdE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1069891035351-a7djsls7n4mofv8gppi06l821io165kd.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
