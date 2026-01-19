@@ -197,11 +197,13 @@ useEffect(() => {
   }, [messages]);
 
   /* ================= SEND MESSAGE ================= */
-  const sendMessage = async () => {
-    if (!input.trim() || loading) return;
-    analytics().logEvent("ai_message_sent", {
-        is_guest: isGuest,
-      });
+ const sendMessage = async (text?: string) => {
+   const finalText = (text ?? input).trim();
+   if (!finalText || loading) return;
+
+   analytics().logEvent("ai_message_sent", {
+     is_guest: isGuest,
+   });
 
     const userMessageCount = messages.filter(
       (m) => m.sender === "user"
@@ -216,7 +218,7 @@ useEffect(() => {
 
     const userMessage: Message = {
       id: generateId(),
-      text: input.trim(),
+      text: finalText,
       sender: "user",
     };
 
@@ -234,16 +236,21 @@ useEffect(() => {
     try {
       const res = await axios.post(
         `${BACKEND_URL}/chat`,
-        { message: userMessage.text },
+        {
+          message: userMessage.text,
+          userId: user?.uid || null,
+        },
         { headers: { Authorization: `Bearer ${BASIC_API_KEY}` } }
       );
+
 
       setMessages((p) => {
         const updated = [...p];
         updated[updated.length - 1] = {
           id: generateId(),
           sender: "ai",
-          text: res.data?.answer,
+          text: cleanText(res.data?.answer || ""),
+
         };
         return updated;
       });
@@ -300,6 +307,27 @@ useEffect(() => {
                 </Text>
 
       </LinearGradient>
+      {messages.length === 1 && !isGuest && (
+        <View style={styles.moodWrap}>
+          <View style={styles.moodCard}>
+            {[
+               "😊 Feeling Good",
+               "😌 Just Okay",
+               "😔 Not Feeling Great"
+             ].map((m) => (
+               <TouchableOpacity
+                  key={m}
+                  onPress={() => sendMessage(m)}
+                  style={styles.moodChip}
+                >
+                  <Text style={styles.moodText}>{m}</Text>
+                </TouchableOpacity>
+              ))}
+          </View>
+        </View>
+      )}
+
+
 
       <FlatList
         ref={flatRef}
@@ -535,4 +563,33 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: "#94A3B8",
   },
+moodWrap: {
+  paddingHorizontal: 10,
+  marginTop: 10,   // header se thoda neeche float karega
+  marginBottom: 10,
+},
+
+moodCard: {
+  flexDirection: "row",
+  justifyContent: "space-between",
+  backgroundColor: "rgba(255,255,255,0.08)",
+  borderRadius: 20,
+  padding: 10,
+  borderWidth: 1,
+  borderColor: "rgba(255,255,255,0.15)",
+},
+
+moodChip: {
+  paddingVertical: 8,
+  paddingHorizontal: 14,
+  borderRadius: 999,
+  backgroundColor: "rgba(255,255,255,0.12)",
+},
+
+moodText: {
+  color: "#E5E7EB",
+  fontSize: 13,
+  fontWeight: "600",
+},
+
 });

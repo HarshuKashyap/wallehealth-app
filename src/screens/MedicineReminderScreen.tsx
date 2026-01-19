@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, StatusBar, Modal } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import LinearGradient from "react-native-linear-gradient";
 import notifee, { TriggerType, RepeatFrequency } from "@notifee/react-native";
 import firestore from "@react-native-firebase/firestore";
 import auth from "@react-native-firebase/auth";
@@ -25,13 +26,6 @@ export default function MedicineReminderScreen({ navigation }: any) {
 
 
 
-  const ensureChannel = async () => {
-    return await notifee.createChannel({
-      id: "medicine",
-      name: "Smart Reminder",
-      importance: 4,
-    });
-  };
 
 const [modal, setModal] = useState<{
   title: string;
@@ -73,7 +67,7 @@ const [modal, setModal] = useState<{
 
     try {
       setSaving(true);
-      const channelId = await ensureChannel();
+
 
       const date = new Date();
       date.setHours(hour, minute, 0, 0);
@@ -89,7 +83,7 @@ const [modal, setModal] = useState<{
           title: "WALLE Care 💙",
           body: `Hey! ${name} ka time ho gaya ⏰`,
           android: {
-            channelId,
+            channelId: "walle_default", // 👈 same channel as whole app
             smallIcon: "ic_notification",
             pressAction: { id: "default" },
           },
@@ -100,6 +94,7 @@ const [modal, setModal] = useState<{
           repeatFrequency: RepeatFrequency.DAILY,
         }
       );
+
 
       const user = auth().currentUser;
       if (user && !user.isAnonymous) {
@@ -210,12 +205,18 @@ const [modal, setModal] = useState<{
         <TouchableOpacity
           onPress={schedule}
           disabled={saving}
-          style={styles.saveBtn}
+          activeOpacity={0.9}
         >
-          <Text style={styles.saveText}>
-            {saving ? "Saving..." : "Set Reminder"}
-          </Text>
+          <LinearGradient
+            colors={["#1E2A78", "#5B6CFF", "#9B7BFF"]}
+            style={[styles.saveBtn, saving && { opacity: 0.7 }]}
+          >
+            <Text style={styles.saveText}>
+              {saving ? "Saving..." : "Set Reminder"}
+            </Text>
+          </LinearGradient>
         </TouchableOpacity>
+
       </View>
 
 

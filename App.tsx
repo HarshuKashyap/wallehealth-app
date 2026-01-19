@@ -29,6 +29,17 @@ import {
 
 import { initFCM } from "./src/notifications/fcmService";
 
+async function setupDefaultChannel() {
+  await notifee.createChannel({
+    id: "walle_default",
+    name: "WALLE Notifications",
+    importance: AndroidImportance.HIGH,
+    // ⚠️ sound mat do – system ki default tone use hogi
+  });
+}
+
+setupDefaultChannel();
+
 /* ================= NAV REF ================= */
 export const navigationRef = createNavigationContainerRef();
 
@@ -55,12 +66,6 @@ notifee.onBackgroundEvent(async ({ type, detail }) => {
 /* ================= BACKGROUND / KILLED ================= */
 /* 🔥 ONLY SHOW NOTIFICATION — NO FIRESTORE SAVE */
 messaging().setBackgroundMessageHandler(async (remoteMessage) => {
-  const channelId = await notifee.createChannel({
-    id: "walle-push",
-    name: "WALLE Push Notifications",
-    importance: AndroidImportance.HIGH,
-  });
-
   await notifee.displayNotification({
     title:
       remoteMessage.notification?.title ??
@@ -75,71 +80,44 @@ messaging().setBackgroundMessageHandler(async (remoteMessage) => {
     data: remoteMessage.data,
 
     android: {
-      channelId,
+      channelId: "walle_default",
       smallIcon: "ic_notification",
-      showTimestamp: true,
-      when: Date.now(),
-      importance: AndroidImportance.HIGH,
-      category: AndroidCategory.SOCIAL,
       pressAction: { id: "default" },
-      style: {
-        type: AndroidStyle.BIGTEXT,
-        text:
-          remoteMessage.notification?.body ??
-          remoteMessage.data?.body ??
-          "Tap to open WALLE Health",
-      },
     },
   });
 });
+
 
 export default function App() {
       const routeNameRef = useRef<string | undefined>();
   /* ================= FOREGROUND ================= */
   /* 🔥 ONLY SHOW NOTIFICATION — NO FIRESTORE SAVE */
-  useEffect(() => {
-    const unsub = messaging().onMessage(async (remoteMessage) => {
-      const channelId = await notifee.createChannel({
-        id: "walle-push",
-        name: "WALLE Push Notifications",
-        importance: AndroidImportance.HIGH,
-      });
+ useEffect(() => {
+   const unsub = messaging().onMessage(async (remoteMessage) => {
+     await notifee.displayNotification({
+       title:
+         remoteMessage.notification?.title ??
+         remoteMessage.data?.title ??
+         "WALLE Health",
 
-      await notifee.displayNotification({
-        title:
-          remoteMessage.notification?.title ??
-          remoteMessage.data?.title ??
-          "WALLE Health",
+       body:
+         remoteMessage.notification?.body ??
+         remoteMessage.data?.body ??
+         "",
 
-        body:
-          remoteMessage.notification?.body ??
-          remoteMessage.data?.body ??
-          "",
+       data: remoteMessage.data,
 
-        data: remoteMessage.data,
+       android: {
+         channelId: "walle_default", // 👈 same channel everywhere
+         smallIcon: "ic_notification",
+         pressAction: { id: "default" },
+       },
+     });
+   });
 
-        android: {
-          channelId,
-          smallIcon: "ic_notification",
-          largeIcon: "ic_notification_large",
-          showTimestamp: true,
-          when: Date.now(),
-          importance: AndroidImportance.HIGH,
-          category: AndroidCategory.SOCIAL,
-          pressAction: { id: "default" },
-          style: {
-            type: AndroidStyle.BIGTEXT,
-            text:
-              remoteMessage.notification?.body ??
-              remoteMessage.data?.body ??
-              "Tap to open WALLE Health",
-          },
-        },
-      });
-    });
+   return unsub;
+ }, []);
 
-    return unsub;
-  }, []);
 
   /* ================= AUTH + LOCAL SCHEDULES ================= */
   useEffect(() => {

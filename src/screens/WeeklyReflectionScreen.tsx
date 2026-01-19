@@ -78,12 +78,20 @@ export default function WeeklyReflectionScreen() {
         const total = tasksSnap.size;
         const done = tasksSnap.docs.filter(t => t.data().completed).length;
 
+        const start = new Date(d);
+        start.setHours(0, 0, 0, 0);
+
+        const end = new Date(d);
+        end.setHours(23, 59, 59, 999);
+
         const symSnap = await firestore()
           .collection("users")
           .doc(user.uid)
           .collection("symptoms")
-          .where("date", "==", d)
+          .where("createdAt", ">=", start)
+          .where("createdAt", "<=", end)
           .get();
+
 
         const symptoms = symSnap.docs.map(s => s.data().text);
 
@@ -114,11 +122,18 @@ export default function WeeklyReflectionScreen() {
 
       setText(res.data.message);
       setLoading(false);
-    } catch (e) {
-      console.log(e);
-      setText("We couldn’t generate your reflection right now.");
-      setLoading(false);
-    }
+     } catch (e: any) {
+       console.log("PDF ERROR:", e);
+
+       let msg = "Unknown error";
+
+       if (e?.message) msg = e.message;
+       if (e?.response?.status) msg = "HTTP " + e.response.status;
+       if (e?.response?.data) msg = JSON.stringify(e.response.data);
+
+       alert("PDF Error: " + msg);
+     }
+
   };
 
   const downloadAndSharePDF = async () => {
@@ -146,7 +161,9 @@ export default function WeeklyReflectionScreen() {
           ? profileName
           : "User";
 
-      const filePath = `${RNFS.DownloadDirectoryPath}/WALLE_Weekly_Report.pdf`;
+      const filePath = `${RNFS.CachesDirectoryPath}/WALLE_Weekly_Report.pdf`;
+
+
 
       const body = {
         userName: finalName,   // 👈 ab yahan email nahi, profile ka name jayega
@@ -173,22 +190,44 @@ export default function WeeklyReflectionScreen() {
       const arrayBuffer = await response.arrayBuffer();
       const base64 = Buffer.from(arrayBuffer).toString("base64");
 
+      const dir = RNFS.DocumentDirectoryPath;
+
+
+      const dirExists = await RNFS.exists(dir);
+      if (!dirExists) {
+        await RNFS.mkdir(dir);
+      }
+
       await RNFS.writeFile(filePath, base64, "base64");
 
+      const shareUrl =
+        Platform.OS === "android" ? `file://${filePath}` : filePath;
+
       await Share.open({
-        url: `file://${filePath}`,
+        url: shareUrl,
         type: "application/pdf",
         title: "Share with Doctor",
+        message: "My weekly health report from WALLE",
+        failOnCancel: false,
       });
-    } catch (e) {
-      console.log("PDF ERROR:", e);
-      alert("Could not generate report right now.");
-    }
+
+
+
+
+
+      } catch (e: any) {
+        console.log("PDF ERROR:", e);
+
+        let msg = "Unknown error";
+
+        if (e?.message) msg = e.message;
+        if (e?.response?.status) msg = "HTTP " + e.response.status;
+        if (e?.response?.data) msg = JSON.stringify(e.response.data);
+
+        alert("PDF Error: " + msg);
+      }
+
   };
-
-
-
-
 
 
 

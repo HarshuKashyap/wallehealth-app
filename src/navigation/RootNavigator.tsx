@@ -26,6 +26,8 @@ import NearbyDoctorsScreen from "../screens/NearbyDoctorsScreen";
 import NotificationsScreen from "../screens/NotificationsScreen";
 import WeeklyReflectionScreen from "../screens/WeeklyReflectionScreen";
 import MedicineReminderScreen from "../screens/MedicineReminderScreen";
+import SecretMode from "../screens/SecretMode";
+
 
 
 const Stack = createNativeStackNavigator();
@@ -50,6 +52,7 @@ export default function RootNavigator() {
 
       {/* MAIN */}
       <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="SecretMode" component={SecretMode} options={{ headerShown: false }} />
       <Stack.Screen name="DailyTask" component={DailyAITaskScreen} options={{ headerShown: false }} />
       <Stack.Screen name="AddSymptoms" component={AddSymptomsScreen} options={{ headerShown: false }} />
       <Stack.Screen name="MedicineReminder" component={MedicineReminderScreen} options={{ headerShown: false }}/>

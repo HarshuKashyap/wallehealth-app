@@ -56,6 +56,10 @@ export default function HomeScreen() {
   const [walleLine, setWalleLine] = useState("");
   const walleAnim = useRef(new Animated.Value(0)).current;
   const [aiMessage, setAiMessage] = useState<string | null>(null);
+  const [energy, setEnergy] = useState(50);
+  const [mood, setMood] = useState<"happy" | "normal" | "sad">("normal");
+  const [streak, setStreak] = useState(0);
+
 
   const [open, setOpen] = useState(false);
   const translateX = useRef(new Animated.Value(-MENU_WIDTH)).current;
@@ -154,7 +158,16 @@ export default function HomeScreen() {
       .doc(user.uid)
       .onSnapshot((snap) => {
         if (snap.exists) {
+          const s = snap.data()?.streak || 0;
           setUserName(snap.data()?.name || "User");
+          setStreak(s);
+
+          let e = Math.min(100, 20 + s * 15);
+          setEnergy(e);
+
+          if (e >= 70) setMood("happy");
+          else if (e >= 40) setMood("normal");
+          else setMood("sad");
         }
       });
 
@@ -272,21 +285,47 @@ useEffect(() => {
           )}
 
           {/* 🔥 WALLE FIRST IMPRESSION CARD */}
-          <View style={styles.walleCard}>
-            <Animated.Image
-              source={require("../assets/walle.png")}
-              style={[
-                styles.walleImg,
-                { transform: [{ translateY: walleAnim }] },
-              ]}
-            />
+          {/* 🌟 HERO WALLE ZONE */}
+          <View style={styles.heroWalle}>
+            <TouchableOpacity
+              activeOpacity={0.9}
+              onLongPress={() => {
+                const hour = new Date().getHours();
+                if (hour >= 0 && hour <= 4) {
+                  navigation.navigate("SecretMode");
+                } else {
+                  setAiMessage("Ye raasta raat ke liye hai… 12 baje ke baad try karo 🌙");
+                }
+              }}
+            >
+              <Animated.Image
+                source={
+                  mood === "happy"
+                    ? require("../assets/walle_happy.png")
+                    : mood === "sad"
+                    ? require("../assets/walle_sad.png")
+                    : require("../assets/walle.png")
+                }
+                style={[
+                  styles.heroImg,
+                  { transform: [{ translateY: walleAnim }] },
+                ]}
+              />
+            </TouchableOpacity>
 
-            <View style={{ flex: 1, marginLeft: 12 }}>
-              <Text style={styles.walleTitle}>{t("ai_intro")}</Text>
-              <Text style={styles.walleSub}>{walleLine}</Text>
+            <Text style={styles.heroLine}>
+              {mood === "happy"
+                ? "Tum aaye, mujhe energy mil gayi 💙"
+                : mood === "sad"
+                ? "Aaj tum nahi aaye the… main thoda dull ho gaya hoon."
+                : "Main yahin hoon, tumhara saath dene ke liye."}
+            </Text>
 
-            </View>
+            <Text style={styles.heroMeta}>
+              Energy: {energy}%  •  Streak: {streak} days 🔥
+            </Text>
           </View>
+
 
           <Text style={styles.heading}>{greeting}</Text>
           <Text style={styles.subHeading}>{subGreeting}</Text>
@@ -388,19 +427,18 @@ useEffect(() => {
               markAction("ai_opened");
               navigation.navigate("AI");
             }}
-
             activeOpacity={0.85}
           >
             <Ionicons name="sparkles" size={30} color="#6366F1" />
 
             <View style={{ flex: 1, marginLeft: 12 }}>
-              <Text style={styles.walleTaskTitle}>{t("ai_assistant")}</Text>
-              <Text style={styles.walleTaskSub}>{t("ai_assistant_desc")}</Text>
-
+              <Text style={styles.walleTaskTitle}>WALLE Companion</Text>
+              <Text style={styles.walleTaskSub}>Talk about how you feel</Text>
             </View>
 
             <Ionicons name="chevron-forward" size={22} color="#A5B4FC" />
           </TouchableOpacity>
+
 
         </ScrollView>
       </SafeAreaView>
@@ -422,7 +460,17 @@ useEffect(() => {
       <Modal transparent visible={showGuide} animationType="fade">
         <View style={styles.guideOverlay}>
           <View style={styles.guideCard}>
-            <Ionicons name="sparkles" size={48} color="#6366F1" />
+            <Animated.Image
+              source={require("../assets/walle.png")}
+              style={{
+                width: 72,
+                height: 72,
+                resizeMode: "contain",
+                marginBottom: 8,
+                transform: [{ translateY: walleAnim }],
+              }}
+            />
+
             <Text style={styles.guideTitle}>{t("welcome")}</Text>
             <Text style={styles.guideText}>
               • Start with AI Daily Health Task{"\n"}
@@ -443,6 +491,36 @@ useEffect(() => {
 }
 
 const styles = StyleSheet.create({
+
+    heroWalle: {
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: "rgba(99,102,241,0.12)",
+      borderRadius: 28,
+      paddingVertical: 26,
+      paddingHorizontal: 16,
+      marginBottom: 24,
+      borderWidth: 1,
+      borderColor: "rgba(99,102,241,0.3)",
+    },
+    heroImg: {
+      width: 140,
+      height: 140,
+      resizeMode: "contain",
+    },
+    heroLine: {
+      marginTop: 12,
+      fontSize: 16,
+      fontWeight: "800",
+      color: "#E5E7EB",
+      textAlign: "center",
+    },
+    heroMeta: {
+      marginTop: 6,
+      fontSize: 13,
+      color: "#A5B4FC",
+    },
+
   header: {
     paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
     height: 56 + (Platform.OS === "android" ? StatusBar.currentHeight || 0 : 0),
